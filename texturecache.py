@@ -2606,12 +2606,17 @@ class MyJSONComms(object):
 
     self.sendJSON(REQUEST, "libRescan", callback=self.jsonWaitForScanFinished, checkResult=False)
 
-  def cleanLibrary(self, cleanMethod):
-    self.logger.out("Cleaning library...", newLine=True, log=True)
-    REQUEST = {"method": cleanMethod}
+  def cleanLibrary(self, cleanMethod, path=None):
+    if path and path != "":
+      self.logger.out("Cleaning library directory: %s..." % path, newLine=True, log=True)
+      REQUEST = {"method": cleanMethod, "params":{"directory": path}}
+    else:
+      self.logger.out("Cleaning library...", newLine=True, log=True)
+      REQUEST = {"method": cleanMethod}
 
     if self.config.JSON_HAS_LIB_SHOWDIALOGS_PARAM:
-      REQUEST["params"] = {"showdialogs": self.config.CLEAN_SHOW_DIALOGS}
+      if "params" not in REQUEST: REQUEST["params"] = {}
+      REQUEST["params"].update({"showdialogs": self.config.CLEAN_SHOW_DIALOGS})
 
     self.sendJSON(REQUEST, "libClean", callback=self.jsonWaitForCleanFinished, checkResult=False)
 
@@ -7152,12 +7157,14 @@ def doLibraryScan(media, path):
   else:
     return jcomms.aUpdateCount
 
-def doLibraryClean(media):
+def doLibraryClean(media, path):
   jcomms = MyJSONComms(gConfig, gLogger)
-
-  cleanMethod = "VideoLibrary.Clean" if media == "video" else "AudioLibrary.Clean"
-
-  jcomms.cleanLibrary(cleanMethod)
+  
+  if media == "video":
+    cleanMethod = "VideoLibrary.Clean"
+    jcomms.cleanLibrary(cleanMethod, path)
+  else:
+    cleanMethod = "AudioLibrary.Clean"
 
 def getDirectory(path, recurse=False):
   getDirectoryFiles(MyJSONComms(gConfig, gLogger), path, nodirmsg=True, recurse=recurse)
@@ -7698,7 +7705,7 @@ def usage(EXIT_CODE):
           watched class restore <filename> [filter] | \
           duplicates | \
           set | testset | set class libraryid key1 value 1 [key2 value2...] | \
-          missing class src-label [src-label]* | ascan [path] |vscan [path] | aclean | vclean | \
+          missing class src-label [src-label]* | ascan [path] |vscan [path] | aclean | vclean [path] | \
           sources [media] | sources media [label] | directory path | rdirectory path | readfile infile [outfile ; -] | \
           notify title message [displaytime [image]] | \
           status [idleTime] | monitor | power <state> | exec [params] | execw [params] | wake | \
@@ -7749,7 +7756,7 @@ def usage(EXIT_CODE):
   print("  ascan      Scan entire audio library, or specific path")
   print("  vscan      Scan entire video library, or specific path")
   print("  aclean     Clean audio library")
-  print("  vclean     Clean video library")
+  print("  vclean     Clean entire video library, or specific path")
   print("  sources    List all sources, or sources for specific media type (video, music, pictures, files, programs) or label (eg. \"My Movies\")")
   print("  directory  Retrieve list of files in a specific directory (see sources)")
   print("  rdirectory Recursive version of directory")
@@ -8508,10 +8515,10 @@ def main(argv):
     EXIT_CODE = doLibraryScan("audio", path=argv[1] if len(argv) == 2 else None)
 
   elif argv[0] == "vclean":
-    doLibraryClean("video")
+    doLibraryClean("video", path=argv[1] if len(argv) == 2 else None)
 
   elif argv[0] == "aclean":
-    doLibraryClean("audio")
+    doLibraryClean("audio", path=None)
 
   elif argv[0] == "directory" and len(argv) == 2:
     getDirectory(argv[1], recurse=False)
