@@ -2592,6 +2592,8 @@ class MyJSONComms(object):
 
   def scanDirectory(self, scanMethod, path=None):
     if path and path != "":
+      # add trailing slash if not present, to prevent Kodi scraping season folder names etc
+      path = os.path.join(path, '')
       self.logger.out("Rescanning directory: %s..." % path, newLine=True, log=True)
       REQUEST = {"method": scanMethod, "params":{"directory": path}}
     else:
