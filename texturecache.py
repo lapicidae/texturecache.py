@@ -249,8 +249,9 @@ class MyConfiguration(object):
     self.QUERY_EPISODES = self.getBoolean(config, "query.episodes", "yes") if self.QUERY_SEASONS else False
 
     self.DOWNLOAD_THREADS_DEFAULT = int(self.getValue(config, "download.threads", "2"))
-    self.DOWNLOAD_RETRY = int(self.getValue(config, "download.retry", "3"))
-    self.DOWNLOAD_PRIME = self.getBoolean(config, "download.prime", "yes")
+    self.DOWNLOAD_RETRY = int(self.getValue(config, "download.retry", "0"))
+    self.DOWNLOAD_PRIME = self.getBoolean(config, "download.prime", "no")
+    self.DOWNLOAD_INTERVAL = float(self.getValue(config, "download.interval", "1.5"))
 
     # It seems that Files.Preparedownload is sufficient to populate the texture cache
     # so there is no need to actually download the artwork.
@@ -792,6 +793,7 @@ class MyConfiguration(object):
       for dt in self.DOWNLOAD_THREADS:
         if self.DOWNLOAD_THREADS[dt] != self.DOWNLOAD_THREADS_DEFAULT:
           print("  %s = %d" % (dt, self.DOWNLOAD_THREADS[dt]))
+    print("  download.interval = %s" % self.DOWNLOAD_INTERVAL)
     print("  singlethread.urls = %s" % self.NoneIsBlank(self.getListFromPattern(self.SINGLETHREAD_URLS)))
     print("  extrajson.addons  = %s" % self.NoneIsBlank(self.XTRAJSON["extrajson.addons"]))
     print("  extrajson.agenres = %s" % self.NoneIsBlank(self.XTRAJSON["extrajson.agenres"]))
@@ -1107,7 +1109,8 @@ class MyImageLoader(threading.Thread):
             self.error_queue.put(item)
 
           self.complete_queue.put(item)
-
+          # delay to keep under site API limits
+          time.sleep(self.config.DOWNLOAD_INTERVAL)
         except Queue.Empty:
           break
 
