@@ -19,6 +19,9 @@
 #webserver.port = 8080
 #rpc.port = 9090
 #download.threads = 2
+#download.prime = no
+#download.retry = 0
+#download.interval = 1.5
 #extrajson.albums  =
 #extrajson.artists =
 #extrajson.songs   =
