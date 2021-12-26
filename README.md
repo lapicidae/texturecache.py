@@ -1,3 +1,5 @@
+> :warning: **The original script upstream is no longer in development. This fork adds some minor fixes/features, but no guarantee of future updates.**
+
 texturecache.py
 ===============
 
@@ -426,6 +428,9 @@ webserver.username =
 webserver.password =
 rpc.port = 9090
 download.threads = 2
+download.prime = no
+download.retry = 0
+download.interval = 1.5
 singlethread.urls = assets\.fanart\.tv
 extrajson.addons =
 extrajson.albums =
