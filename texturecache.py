@@ -7162,12 +7162,10 @@ def doLibraryScan(media, path):
 
 def doLibraryClean(media, path):
   jcomms = MyJSONComms(gConfig, gLogger)
-  
-  if media == "video":
-    cleanMethod = "VideoLibrary.Clean"
-    jcomms.cleanLibrary(cleanMethod, path)
-  else:
-    cleanMethod = "AudioLibrary.Clean"
+
+  cleanMethod = "VideoLibrary.Clean" if media == "video" else "AudioLibrary.Clean"
+
+  jcomms.cleanLibrary(cleanMethod, path)
 
 def getDirectory(path, recurse=False):
   getDirectoryFiles(MyJSONComms(gConfig, gLogger), path, nodirmsg=True, recurse=recurse)
