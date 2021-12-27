@@ -4729,9 +4729,9 @@ def jsonQuery(action, mediatype, filter="", force=False, extraFields=False, resc
 # to determine which should be skipped (those in the cache, unless
 # force update is true).
 #
-# Those that are not skipped will be added to a queueu for processing by
+# Those that are not skipped will be added to a queue for processing by
 # 1..n threads. Errors will be added to an error queue by the threads, and
-# subsueqently displayed to the user at the end.
+# subsequently displayed to the user at the end.
 #
 def cacheImages(mediatype, jcomms, database, data, title_name, id_name, force, nodownload, drop_items):
 
